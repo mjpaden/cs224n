@@ -35,7 +35,11 @@ class CharDecoder(nn.Module):
         """
         ### YOUR CODE HERE for part 2a
         ### TODO - Implement the forward pass of the character decoder.
-
+        input_emb = self.decoderCharEmb(input)
+        lstm_outputs, dec_hidden = \
+            self.charDecoder(input_emb, dec_hidden)
+        scores = self.char_output_projection(lstm_outputs)
+        return scores, dec_hidden
         ### END YOUR CODE
 
     def train_forward(self, char_sequence, dec_hidden=None):
@@ -53,7 +57,18 @@ class CharDecoder(nn.Module):
         ###       - char_sequence corresponds to the sequence x_1 ... x_{n+1} (e.g., <START>,m,u,s,i,c,<END>). Read the handout about how to construct input and target sequence of CharDecoderLSTM.
         ###       - Carefully read the documentation for nn.CrossEntropyLoss and our handout to see what this criterion have already included:
         ###             https://pytorch.org/docs/stable/nn.html#crossentropyloss
+        char_pad = self.target_vocab.char_pad
+        loss = nn.CrossEntropyLoss(ignore_index=char_pad, reduction='sum')
 
+        scores, _ = self(char_sequence, dec_hidden)
+
+        vocab_size = scores.size(2)
+        scores = scores[:-1].reshape([-1, vocab_size])
+
+        targets = char_sequence[1:].reshape([-1])
+
+        train_loss = loss(scores, targets)
+        return train_loss
         ### END YOUR CODE
 
     def decode_greedy(self, initialStates, device, max_length=21):
@@ -75,6 +90,32 @@ class CharDecoder(nn.Module):
         ###      - You may find torch.argmax or torch.argmax useful
         ###      - We use curly brackets as start-of-word and end-of-word characters. That is, use the character '{' for <START> and '}' for <END>.
         ###        Their indices are self.target_vocab.start_of_word and self.target_vocab.end_of_word, respectively.
+        batch_size = initialStates[0].size(1)
 
+        vocab = self.target_vocab
+        sow_idx = vocab.start_of_word
+        eow_idx = vocab.end_of_word
+
+        decodedWords = [''] * batch_size
+        next_idxs = torch.tensor([[sow_idx] * batch_size], device=device)
+        finished_words = torch.tensor([False] * batch_size, device=device)
+
+        states = initialStates
+
+        for i in range(max_length):
+            next_embs = self.decoderCharEmb(next_idxs)
+            output, states = self.charDecoder(next_embs, states)
+            scores = self.char_output_projection(output)
+            next_idxs = scores.argmax(dim=2)
+
+            finished_words = finished_words.logical_or(next_idxs.eq(eow_idx))
+            if finished_words.min() == 1:
+                break
+
+            decodedWords = \
+                [x + vocab.id2char[int(next_idxs[0, i])]
+                 if not finished_words[0, i] else x
+                 for (i, x) in enumerate(decodedWords)]
+
+        return decodedWords
         ### END YOUR CODE
-

@@ -39,7 +39,15 @@ class ModelEmbeddings(nn.Module):
         super(ModelEmbeddings, self).__init__()
 
         ### YOUR CODE HERE for part 1h
-
+        dropout_rate = 0.3
+        n_chars = len(vocab.char2id)
+        self.char_embed_size = 50
+        self.word_embed_size = word_embed_size
+        self.vocab = vocab
+        self.char_embed = nn.Embedding(n_chars, self.char_embed_size)
+        self.conv = CNN(self.char_embed_size, word_embed_size)
+        self.highway = Highway(word_embed_size)
+        self.dropout = nn.Dropout(dropout_rate)
         ### END YOUR CODE
 
     def forward(self, input):
@@ -52,6 +60,18 @@ class ModelEmbeddings(nn.Module):
             CNN-based embeddings for each word of the sentences in the batch
         """
         ### YOUR CODE HERE for part 1h
-
+        # sentence_length x batch_size x max_word_length
+        orig_size = input.size()
+        merged_input = input.reshape(-1, orig_size[-1])
+        # s*b x max_word_length
+        x_char_embed = self.char_embed(merged_input)
+        # s*b x max_word_length x char_embed_size
+        x_reshaped = x_char_embed.transpose(-1, -2)
+        # s*b x char_embed_size x max_word_length
+        x_conv = self.conv(x_reshaped)
+        # out s*b x word_embed_size
+        x_emb = self.highway(x_conv)
+        x_drop = self.dropout(x_emb)
+        split_output = x_drop.reshape(list(orig_size[:-1]) + [self.word_embed_size])
+        return split_output
         ### END YOUR CODE
-
