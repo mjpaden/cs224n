@@ -165,13 +165,13 @@ class VocabEntry(object):
         padded_sents = pad_sents_char(sent_as_chars, pad_token)
         # batch_size x max_sentence_length x max_word_length
         sents_var = \
-            torch.tensor(padded_sents, dtype=torch.long, device=device) \
+            torch.Tensor(padded_sents, dtype=torch.long, device=device) \
             .transpose(0, 1).contiguous()
         return sents_var
         ### END YOUR CODE
 
     def to_input_tensor(self, sents: List[List[str]], device: torch.device) -> torch.Tensor:
-        """ Convert list of sentences (words) into tensor with necessary padding for 
+        """ Convert list of sentences (words) into tensor with necessary padding for
         shorter sentences.
 
         @param sents (List[List[str]]): list of sentences (words)

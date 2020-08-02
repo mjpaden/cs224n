@@ -78,10 +78,10 @@ class ParserModel(nn.Module):
 
     def embedding_lookup(self, w):
         """ Utilize `w` to select embeddings from embedding matrix `self.embeddings`
-            @param w (Tensor): input tensor of word indices (batch_size, n_features)
+        @param w (Tensor): input tensor of word indices (batch_size, n_features)
 
-            @return x (Tensor): tensor of embeddings for words represented in w
-                                (batch_size, n_features * embed_size)
+        @return x (Tensor): tensor of embeddings for words represented in w
+                            (batch_size, n_features * embed_size)
         """
 
         ### YOUR CODE HERE (~1-3 Lines)
