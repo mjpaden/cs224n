@@ -121,7 +121,7 @@ def negSamplingLossAndGradient(
     zNegs = sigmoid(-negVecs.dot(centerWordVec))
     loss = -np.log(zPos) - np.log(zNegs).sum()
 
-    gradCenterVec = posVec * (zPos - 1) - np.dot(negVecs.T, zNegs - 1)
+    gradCenterVec = posVec * (zPos - 1) - negVecs.T.dot(zNegs - 1)
 
     gradOutsideVecs = np.zeros_like(outsideVectors)
     posGrad = (zPos - 1) * centerWordVec
