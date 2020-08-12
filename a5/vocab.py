@@ -165,7 +165,7 @@ class VocabEntry(object):
         padded_sents = pad_sents_char(sent_as_chars, pad_token)
         # batch_size x max_sentence_length x max_word_length
         sents_var = \
-            torch.Tensor(padded_sents, dtype=torch.long, device=device) \
+            torch.tensor(padded_sents, dtype=torch.long, device=device) \
             .transpose(0, 1).contiguous()
         return sents_var
         ### END YOUR CODE
