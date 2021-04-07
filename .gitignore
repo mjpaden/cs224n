@@ -1,0 +1,7 @@
+**/.DS_Store
+**/.ipynb_checkpoints
+**/__pycache__
+a1/.nbgrader.log
+a2/utils/*.pyc
+a4/sanity_check_en_es_data/*.pkl
+a5/sanity_check_en_es_data/*.pkl
