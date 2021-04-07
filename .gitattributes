@@ -1,0 +1,3 @@
+**/*.json linguist-vendored
+**/*.es linguist-vendored
+**/*.en linguist-vendored
