@@ -1,4 +1,4 @@
-# Stanford CS224N (Natural Language Processing)
+# Stanford [CS224N](https://web.stanford.edu/class/archive/cs/cs224n/cs224n.1194/) (Natural Language Processing)
 
 ## Completed coding assignments
 
